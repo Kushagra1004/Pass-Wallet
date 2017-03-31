@@ -9,7 +9,7 @@ main.geometry("400x200")
 
 
 def click_enter():
-      global frame1,frame2,store_pass
+      global frame1,frame2,store_pass,textarea
       check_pass=store_pass.get()
       if (check_pass=="walletpassword"):
           frame1.destroy()
@@ -21,16 +21,25 @@ def click_enter():
           scrollbar = tk.Scrollbar(frame2)
           scrollbar.pack(side="right", fill="y")
 
+
           textarea=tk.Text(frame2,yscrollcommand=scrollbar.set)
           textarea.pack(fill="both",expand=True)
 
+
           scrollbar.config(command=textarea.yview)
 
-          Add_Button=tk.Button(main , text="Add", command ="", relief= "raised" )
-          Add_Button.place(x=250,y=440)
+          Add_Button=tk.Button(main , text="Save", command =on_save_click, relief= "raised" )
+          Add_Button.place(x=245,y=440)
           Enter_Button.destroy()
       else:
           tk.Label(frame1,text="Retry").grid(row=1,columnspan=2)
+
+
+    global textarea
+    store_data=textarea.get('1.0',"end")
+    with open("test.pas", "w") as file:
+        file.writelines(store_data)
+
 
 
 
