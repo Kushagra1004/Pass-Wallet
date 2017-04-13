@@ -11,10 +11,10 @@ from PIL import ImageTk, Image
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, padding
-from passlib.hash import pbkdf2_sha256
+#from passlib.hash import pbkdf2_sha256
 
 main_window=tk.Tk()   #main_window the root container
-main_window.configure(background="azure4")
+main_window.configure(background="#393640")
 main_window.geometry("400x200")
 
 default_password='walletpassword'
@@ -29,6 +29,7 @@ def create_save_password(password):
         file.close()
 
 if (not os.path.isfile('pass.wal')):
+    tk.Label(main_window,text="DEFAULT PASSWORD = walletpassword").place(x=100,y=175)
     create_save_password(str.encode(default_password))
 
 
@@ -55,6 +56,7 @@ def click_enter(self):
           frame1.destroy()
           frame.destroy()
           main_window.geometry("500x500")
+          main_window.configure(background="azure4")
           frame2 = tk.LabelFrame (main_window , text = "PASS-WALLET")
           frame2.pack(fill="x",expand=False)
           heading=tk.Message(frame2, text ="Enter your secret data", width=125)
@@ -64,15 +66,15 @@ def click_enter(self):
 
           textarea=tk.Text(frame2,yscrollcommand=scrollbar.set)
           textarea.pack(fill="both",expand=True)
-          if os.path.exists("test.wal"):
-              with open("test.wal","rb") as ofile:
+          if os.path.exists("data.wal"):
+              with open("data.wal","rb") as ofile:
                   content=ofile.read()
                   key = make_key(str.encode(my_password))
                   cipher=Fernet(key)
                   decrypted_data=cipher.decrypt(bytes(content))
                   textarea.insert("end",decrypted_data)
           else:
-              with open("test.wal","w+") as ofile:
+              with open("data.wal","w+") as ofile:
                   content=ofile.write('')
                   textarea.insert("end",content)
 
@@ -86,15 +88,15 @@ def click_enter(self):
 
           Enter_Button.destroy()
       else:
-          tk.Label(frame1,text="Retry").grid(row=1,columnspan=2)
+          tk.Label(frame1,text="Retry! not the correct password").grid(row=1,columnspan=2)
 
 
 
 
 def click_confirm(self):
-     global store_old_pass,store_new_pass,my_password
+     global store_old_pass,store_new_pass,my_password,change_pass_window
      if (len (store_new_pass.get())<=5):
-         tk.Label(frame3,text="Retry with more than 5 characters").grid(row=2,columnspan=2)
+         tk.Label(frame3,text="Retry! with more than 5 characters").grid(row=2,columnspan=2)
 
      else:
          check_old_pass=store_old_pass.get()
@@ -102,6 +104,7 @@ def click_confirm(self):
          if(check_password(str.encode(check_old_pass))):
                  create_save_password(str.encode(store_new_pass.get()))
                  on_save_click()
+                 change_pass_window.destroy()
          else:
                  tk.Label(frame3,text="Retry! with correct previous password").grid(row=2,columnspan=2)
 
@@ -109,9 +112,8 @@ def click_confirm(self):
 
 def on_save_click():
     global textarea,encrypted_data
-    #kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
 
-    with open("test.wal", "wb") as file:
+    with open("data.wal", "wb") as file:
         global my_password
         key=make_key(str.encode(my_password))
         store_data=textarea.get('1.0',"end")
@@ -128,7 +130,7 @@ def make_key(password):
 
 
 def on_change_pass_click():
-    global store_old_pass,store_new_pass,my_password,frame3
+    global store_old_pass,store_new_pass,my_password,frame3,change_pass_window
     change_pass_window = tk.Toplevel(main_window)
     change_pass_window.geometry("300x300")
     change_pass_window.configure(background="azure4")
